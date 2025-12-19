@@ -112,3 +112,8 @@ func main() {
 	}
 }
 ```
+
+nano ffmpeg bins ~2 Mb:
+
+- [for Linux](https://cdn.jsdelivr.net/gh/imbecility/yt-gateway@main/ffmpeg_nano/ffmpeg_nano)
+- [for Windows](https://cdn.jsdelivr.net/gh/imbecility/yt-gateway@main/ffmpeg_nano/ffmpeg_nano.exe)
