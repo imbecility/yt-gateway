@@ -3,6 +3,7 @@
 Instant download of YouTube videos in small 480p file size, for example, to quickly share via Telegram and save on traffic.
 
 CLI: https://github.com/imbecility/yt-gateway/tree/main/cmd/yt-gateway
+
 CLI-Release: https://github.com/imbecility/yt-gateway/releases/latest
 
 Examle and simply Lib-integration:
