@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/imbecility/yt-gateway/pkg/downloader"
@@ -44,6 +45,20 @@ func (s *Service) ProcessVideo(rawURL string) (*models.VideoResult, string, erro
 		return nil, "", err
 	}
 	result.VideoID = vidID
+
+	if s.needsBetterTitle(result.Title) {
+		slog.Debug("Provider returned generic title, fetching metadata...", "old_title", result.Title)
+		realTitle, gterr := providers.GetVideoTitle(s.Downloader.Client, vidID)
+		if gterr == nil && realTitle != "" {
+			slog.Info("Metadata fetched", "title", realTitle)
+			result.Title = realTitle
+		} else {
+			slog.Warn("Failed to fetch metadata", "err", gterr)
+			if result.Title == "" {
+				result.Title = "video_" + vidID
+			}
+		}
+	}
 
 	slog.Info("Link acquired", "provider", providerName, "needs_muxing", result.NeedsMuxing)
 
@@ -146,4 +161,26 @@ func (s *Service) raceProviders(ctx context.Context, url string) (*models.VideoR
 			return nil, "", errors.New("global timeout")
 		}
 	}
+}
+
+func (s *Service) needsBetterTitle(title string) bool {
+	t := strings.ToLower(strings.TrimSpace(title))
+	if t == "" {
+		return true
+	}
+	badTitles := []string{
+		"youtube video",
+		"video playback",
+		"download video",
+		"yt1s",
+		"loader.do",
+		"techtube",
+		"mp4",
+	}
+	for _, bad := range badTitles {
+		if strings.Contains(t, bad) {
+			return true
+		}
+	}
+	return false
 }
